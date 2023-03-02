@@ -18,7 +18,7 @@ namespace APIUnilink.Controllers
             var randColor = new Random().Next(0, 2);
             NumColor result = new()
             {
-                Color = randColor == 1 ? "red" : "black",
+                Color = randColor == 1 ? "Rojo" : "Negro",
                 Number = randomNumber,
                 Is_pair = randomNumber % 2 == 0
             };
@@ -55,7 +55,7 @@ namespace APIUnilink.Controllers
                     if (user == null)
                     {
                         user = new User();
-                        user.Amount = result_game.Gain > 0 ? result_game.Gain : 0;
+                        user.Amount = bet.Initial_Balance + result_game.Gain;
                         user.Username = bet.Username.ToUpper();
                         Db.Users.Add(user);
                         Db.SaveChanges();

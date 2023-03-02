@@ -15,12 +15,6 @@
           <label class="form-label" >Valor Inicial</label>
         </div>
       </div>
-      <div class="col">
-        <!-- Email input -->
-        <div class="form-outline">
-          <MDBCheckbox label="Guardar Apuesta" v-model="form.is_Save" />
-        </div>
-      </div>
     </div>
     <hr />
     <div class="d-grid gap-2">
@@ -59,11 +53,11 @@
         <!-- Email input -->
         <div class="form-outline">
           <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"  checked  v-model="form.color" value="Rojo" />
+            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" v-model="form.color" value="red" />
             <label class="form-check-label" for="inlineRadio1">Rojo</label>
           </div>
           <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" v-model="form.color" value="Negro" />
+            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" checked  v-model="form.color" value="black" />
             <label class="form-check-label" for="inlineRadio2">Negro</label>
           </div>
         </div>
@@ -74,45 +68,17 @@
       <button class="btn btn-primary" @click.prevent="play()" type="button">Jugar</button>
     </div>
   </div>
-  <MDBModal
-    id="exampleModal"
-    tabindex="-1"
-    labelledby="exampleModalLabel"
-    v-model="exampleModal"
-  >
-    <MDBModalHeader>
-      <MDBModalTitle id="exampleModalLabel"> Modal title </MDBModalTitle>
-    </MDBModalHeader>
-    <MDBModalBody>
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title"><span :class="`${result_class}`" style="text-align: center;">{{ result }}</span></h2>
-        </div>
-          <div class="card-body">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">Numero</th>
-                  <th scope="col">Color</th>
-                  <th scope="col">{{ retrunResul.gain<0 ? 'Total Perdida': 'Total Ganado'  }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr  class="table-info">
-                  <th scope="row" >{{ retrunResul.number }}</th>
-                  <td>{{ retrunResul.color }}</td>
-                  <td>{{ retrunResul.gain }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-    </MDBModalBody>
-  </MDBModal>
+
+  <button @click="open = true">Open Modal</button>
+
+<div v-if="open" class="modal">
+  <p>Hello from the modal!</p>
+  <button @click="open = false">Close</button>
+</div>
 </template>
   <script>
    import axios from "axios";
-   import {MDBBtn,MDBModal,MDBModalTitle,MDBModalHeader,MDBModalBody,MDBModalFooter,MDBCheckbox} from 'mdb-vue-ui-kit'
+
    const axiosInstance = axios.create({
     headers: {
       "Access-Control-Allow-Origin": "*",
@@ -121,7 +87,6 @@
   });
     export default {
       components: {
-        MDBBtn,MDBModal,MDBModalTitle,MDBModalHeader,MDBModalBody,MDBModalFooter,MDBCheckbox
        },
       directives: {   },
       data() {
@@ -131,13 +96,12 @@
             initial_Balance: null,
             amount: null,
             number: null,
-            color: true,
+            color: null,
             is_Save: false
           },
           result: null,
           result_class: "badge badge-primary",
           show: true,
-          exampleModal: false,
           retrunResul: {
             type: Object,
             required: false,
@@ -148,7 +112,6 @@
       },
       methods: {
         startGame(){
-          //this.exampleModal= true
           if( this.form.username!=null && this.form.initial_Balance > 0 && this.form.initial_Balance != null){
             this.show=false;
             this.form.initial_Balance= this.form.initial_Balance
@@ -169,10 +132,9 @@
         playGame(data) {
           axiosInstance.post(import.meta.env.VITE_API_URL+"game/rule",data).then((response) => {
             this.retrunResul=response.data;
-            this.form.initial_Balance=this.form.initial_Balance+response.data.gain
             this.result= response.data.gain<=0? "Loser": "Winer";
             this.result_class= response.data.gain<=0? "badge badge-danger": "badge badge-primary";
-            this.exampleModal= true
+            $('#exampleModal').modal('show');
           }).catch((error) =>{
             console.log(error.response.data)
             alert(error.response.data.detail);
